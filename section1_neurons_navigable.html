@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 1: Neurons and Synapses - The Physical Basis of Learning</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 20px;
+        }
+        h3 {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        /* Progress Indicator */
+        .progress-container {
+            text-align: center;
+            margin: 20px 0 30px 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .progress-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #d0d0d0;
+            transition: all 0.3s ease;
+        }
+        .progress-dot.active {
+            background-color: #3498db;
+            transform: scale(1.3);
+        }
+        .progress-dot.completed {
+            background-color: #27ae60;
+        }
+        
+        /* Section Container */
+        .section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .section.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Navigation Buttons */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            gap: 15px;
+        }
+        .nav-button {
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: Georgia, serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .nav-button.prev {
+            background-color: #95a5a6;
+            color: white;
+        }
+        .nav-button.prev:hover:not(:disabled) {
+            background-color: #7f8c8d;
+            transform: translateX(-3px);
+        }
+        .nav-button.next {
+            background-color: #3498db;
+            color: white;
+        }
+        .nav-button.next:hover:not(:disabled) {
+            background-color: #2980b9;
+            transform: translateX(3px);
+        }
+        .arrow {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .image-placeholder {
+            background-color: #ecf0f1;
+            border: 2px dashed #95a5a6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .image-direction {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: Arial, sans-serif;
+            font-size: 0.9em;
+        }
+        .activity-box {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+        .activity-box h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .questions {
+            background-color: #d4edda;
+            border: 2px solid #28a745;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        .question {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 3px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .choices {
+            margin: 15px 0;
+        }
+        .choice {
+            margin: 8px 0;
+            display: block;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+        .choice:hover {
+            background-color: #f8f9fa;
+        }
+        .choice input[type="radio"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        button.check-answer {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        button.check-answer:hover {
+            background-color: #2980b9;
+        }
+        .feedback {
+            margin-top: 10px;
+        }
+        .difficulty {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+        }
+        em {
+            color: #2980b9;
+            font-style: italic;
+        }
+        strong {
+            color: #c0392b;
+        }
+        
+        /* Fade animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .section.active {
+            animation: fadeIn 0.4s ease-in;
+        }
+        
+        /* Completion message */
+        .completion-box {
+            background-color: #d4edda;
+            border: 2px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .completion-box h3 {
+            color: #155724;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Brain: The Ultimate Learning Machine</h1>
+    <h2>Section 1: Neurons and Synapses - The Physical Basis of Learning</h2>
+
+    <div class="progress-container">
+        <div class="progress-text">
+            <strong>Part <span id="current-part">1</span> of 5</strong>
+        </div>
+        <div class="progress-dots">
+            <div class="progress-dot active" data-part="1"></div>
+            <div class="progress-dot" data-part="2"></div>
+            <div class="progress-dot" data-part="3"></div>
+            <div class="progress-dot" data-part="4"></div>
+            <div class="progress-dot" data-part="5"></div>
+        </div>
+    </div>
+
+    <!-- PART 1: Introduction + Neurons -->
+    <div class="section active" id="part-1">
+        <h3>Introduction: Your Learning Brain</h3>
+        
+        <p>Every time you practice a chess opening, throw a punch in karate, or memorize a new French word, something remarkable happens inside your skull. Your brain—which weighs about three pounds and contains roughly 86 billion nerve cells—physically changes its structure. Learning actually rewires your brain. This is real.</p>
+
+        <p>But how does a blob of tissue learn anything at all?</p>
+
+        <h3>The Brain's Messengers: Neurons</h3>
+
+        <p>Your brain is built from specialized cells called <em>neurons</em>. Unlike other cells in your body, neurons have a very specific job: they communicate with each other using electrical and chemical signals. Think of them as the brain's information superhighway system.</p>
+
+        <p>Each neuron has three main parts. The <em>cell body</em> contains the nucleus and keeps the cell alive. Branch-like <em>dendrites</em> reach out to receive signals from other neurons—sometimes thousands of them. And a long cable called an <em>axon</em> carries signals away to other neurons, sometimes over surprisingly long distances. The axon from a neuron in your spine can stretch all the way down to your toe.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <img src="ff4562ab-a8d3-4a88-a590-6f3cb4a4e453.png" alt="Diagram of a neuron showing cell body, nucleus, dendrites, axon, and axon terminals" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+    </div>
+
+    <!-- PART 2: Synapses -->
+    <div class="section" id="part-2">
+        <h3>Synapses: Where Learning Lives</h3>
+
+        <p>But here's the fascinating part: neurons don't actually touch each other. There's a microscopic gap between the axon of one neuron and the dendrite of the next. This gap is called a <em>synapse</em>, and it's where the magic of learning happens.</p>
+
+        <p>When an electrical signal races down a neuron's axon, it reaches the synapse and triggers the release of chemical messengers called <em>neurotransmitters</em>. These molecules float across the tiny gap and bind to receptors on the next neuron's dendrite, passing the signal along. It happens in milliseconds.</p>
+
+        <p>Your brain contains an astronomical number of these synapses—somewhere around 100 trillion. Every thought you have, every movement you make, every memory you form involves electrical signals traveling across chains of these synaptic connections.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <img src="c486776c-635d-4a59-8b00-1d1e3e525bfc.png" alt="Diagram showing synaptic transmission between two neurons with neurotransmitters crossing the synaptic gap" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+    </div>
+
+    <!-- PART 3: Synaptic Plasticity -->
+    <div class="section" id="part-3">
+        <h3>Use It or Lose It: Synaptic Plasticity</h3>
+
+        <p>Now here's where it gets really interesting. Synapses aren't fixed—they change based on how often they're used. When you practice something repeatedly, whether it's a karate kata or conjugating French verbs, you're activating specific patterns of neurons. Each time those neurons fire together, their synaptic connections grow stronger.</p>
+
+        <p>Scientists have a saying: <strong>"Neurons that fire together, wire together."</strong></p>
+
+        <p>This strengthening process is called <em>synaptic plasticity</em>, and it's the physical foundation of learning. When a synapse is used frequently, several things happen: the sending neuron releases more chemical messengers, the receiving neuron grows more receptors to catch those messages, and the connection becomes more efficient. The signal passes more easily.</p>
+
+        <p>Think about when you first learned to move a chess knight. You had to think carefully about the L-shaped pattern. But after playing dozens of games, moving the knight becomes automatic. That's because the neural pathway for "knight moves in an L" has been strengthened through repeated use. The synapses along that pathway have physically changed.</p>
+
+        <p>But plasticity works in both directions. Synapses that aren't used regularly grow weaker and may eventually disappear. This is why skills you don't practice get rusty. Your brain is remarkably efficient—it doesn't want to waste energy maintaining connections you're not using. If you learned some French words but never practice them, those synaptic connections will fade away. It's like a path in a forest: if people keep walking on it, it stays clear. But if nobody uses it, plants grow over it and it disappears.</p>
+
+        <h3>Building New Highways</h3>
+
+        <p>Learning doesn't just strengthen existing synapses—it can create entirely new ones. When you encounter something genuinely new, like a complex chess strategy you've never seen before, your brain can grow new synaptic connections to encode that information.</p>
+
+        <p>This process is most dramatic in young brains. Children's brains are constantly forming new synapses at an incredibly fast rate, which is why kids pick up new languages or physical skills so easily. But here's the good news: adult brains can still form new synapses throughout life. Your brain at age 9, 40, or even 80 is still capable of rewiring itself through learning.</p>
+
+        <p>The difference is that young brains form synapses more rapidly and have more plasticity. They're like construction sites, building new connections everywhere, super fast. As you get older, your brain focuses more on strengthening the connections you use most often and letting go of the ones you don't need. This is why learning something brand new feels harder as you get older—but it's still completely possible.</p>
+    </div>
+
+    <!-- PART 4: The Physical Reality of Practice -->
+    <div class="section" id="part-4">
+        <h3>The Physical Reality of Practice</h3>
+
+        <p>Understanding synaptic plasticity reveals why practice is so essential. When your karate instructor has you repeat the same technique dozens of times, you're not just going through the motions—you're literally sculpting your brain. Each repetition strengthens specific synaptic pathways, making the movement more automatic and precise.</p>
+
+        <p>The same applies to mental skills. When you review French vocabulary or analyze chess positions, you're reinforcing neural pathways. The synapses involved in those tasks become stronger, making it easier and faster to remember what you learned.</p>
+
+        <p>This also explains why practicing a little bit each day works better than trying to learn everything all at once. If you spread out your French vocabulary practice over a week—say, 10 minutes each day—your synapses have time to strengthen between sessions. But if you try to memorize 50 words in one two-hour session the night before a test, your synapses don't have enough time to make the physical changes that turn short-term learning into permanent knowledge.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <img src="7f5b5c99-2357-44ed-a244-0b27ba6b917d.png" alt="Before and after comparison showing weak synaptic connections becoming strong connections through practice and repetition" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+    </div>
+
+    <!-- PART 5: Questions -->
+    <div class="section" id="part-5">
+        <div class="questions">
+            <h3>📝 Comprehension Check</h3>
+            <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">Select your answer for each question. You'll get immediate feedback!</p>
+            
+            <div class="question" id="q1">
+                <div class="question-text">1. What is the main function of neurons in the brain?</div>
+                <div class="difficulty">(Recall - Basic)</div>
+                <div class="choices">
+                    <label class="choice"><input type="radio" name="q1" value="A"> A) To pump blood throughout the brain</label>
+                    <label class="choice"><input type="radio" name="q1" value="B"> B) To communicate with each other using electrical and chemical signals</label>
+                    <label class="choice"><input type="radio" name="q1" value="C"> C) To store memories in the cell nucleus</label>
+                    <label class="choice"><input type="radio" name="q1" value="D"> D) To protect the brain from injury</label>
+                </div>
+                <button class="check-answer" onclick="checkAnswer('q1', 'B', 'Neurons are specialized cells that communicate using electrical and chemical signals. This is their primary function in the brain.')">Check Answer</button>
+                <div class="feedback" id="q1-feedback"></div>
+            </div>
+
+            <div class="question" id="q2">
+                <div class="question-text">2. What happens at a synapse when a signal travels from one neuron to another?</div>
+                <div class="difficulty">(Recall - Moderate)</div>
+                <div class="choices">
+                    <label class="choice"><input type="radio" name="q2" value="A"> A) The neurons physically touch and exchange electricity</label>
+                    <label class="choice"><input type="radio" name="q2" value="B"> B) Chemical messengers called neurotransmitters cross a gap between neurons</label>
+                    <label class="choice"><input type="radio" name="q2" value="C"> C) The axon grows longer to reach the next neuron</label>
+                    <label class="choice"><input type="radio" name="q2" value="D"> D) Dendrites merge together to form a direct connection</label>
+                </div>
+                <button class="check-answer" onclick="checkAnswer('q2', 'B', 'At the synapse, neurotransmitters (chemical messengers) are released and cross the tiny gap between neurons. The neurons don\'t actually touch!')">Check Answer</button>
+                <div class="feedback" id="q2-feedback"></div>
+            </div>
+
+            <div class="question" id="q3">
+                <div class="question-text">3. According to the principle "neurons that fire together, wire together," what happens when you practice a skill like a chess opening repeatedly?</div>
+                <div class="difficulty">(Application - Moderate)</div>
+                <div class="choices">
+                    <label class="choice"><input type="radio" name="q3" value="A"> A) The neurons stop firing to conserve energy</label>
+                    <label class="choice"><input type="radio" name="q3" value="B"> B) The synaptic connections involved in that skill grow stronger and more efficient</label>
+                    <label class="choice"><input type="radio" name="q3" value="C"> C) New neurons are created specifically for chess</label>
+                    <label class="choice"><input type="radio" name="q3" value="D"> D) The brain moves those neurons to a special chess center</label>
+                </div>
+                <button class="check-answer" onclick="checkAnswer('q3', 'B', 'When you repeatedly practice a skill, the synaptic connections used in that skill strengthen through synaptic plasticity. This is the physical basis of learning!')">Check Answer</button>
+                <div class="feedback" id="q3-feedback"></div>
+            </div>
+
+            <div class="question" id="q4">
+                <div class="question-text">4. Maria learned 20 French vocabulary words last month but hasn't reviewed them since. Based on what you learned about synaptic plasticity, what is most likely happening in her brain?</div>
+                <div class="difficulty">(Application - Advanced)</div>
+                <div class="choices">
+                    <label class="choice"><input type="radio" name="q4" value="A"> A) The synaptic connections for those words are being strengthened automatically</label>
+                    <label class="choice"><input type="radio" name="q4" value="B"> B) The synaptic connections for those words are weakening from lack of use</label>
+                    <label class="choice"><input type="radio" name="q4" value="C"> C) The neurons containing those words are dying</label>
+                    <label class="choice"><input type="radio" name="q4" value="D"> D) The synapses remain exactly the same regardless of practice</label>
+                </div>
+                <button class="check-answer" onclick="checkAnswer('q4', 'B', 'This is the \"use it or lose it\" principle in action. Synapses that aren\'t used regularly weaken over time. The neurons don\'t die, but the connections fade without practice.')">Check Answer</button>
+                <div class="feedback" id="q4-feedback"></div>
+            </div>
+
+            <div class="question" id="q5">
+                <div class="question-text">5. Why is distributed practice (spacing out learning over multiple days) more effective than cramming everything into one session?</div>
+                <div class="difficulty">(Inference - Advanced)</div>
+                <div class="choices">
+                    <label class="choice"><input type="radio" name="q5" value="A"> A) Because it takes less total time</label>
+                    <label class="choice"><input type="radio" name="q5" value="B"> B) Because synaptic changes need time to stabilize and strengthen between practice sessions</label>
+                    <label class="choice"><input type="radio" name="q5" value="C"> C) Because the brain can only focus for short periods</label>
+                    <label class="choice"><input type="radio" name="q5" value="D"> D) Because neurons need rest days like muscles do</label>
+                </div>
+                <button class="check-answer" onclick="checkAnswer('q5', 'B', 'Synaptic changes are biological processes that take time to stabilize. Spacing out practice gives your synapses time to undergo the physical changes that make learning permanent.')">Check Answer</button>
+                <div class="feedback" id="q5-feedback"></div>
+            </div>
+
+            <div class="question" id="q6">
+                <div class="question-text">6. A neuroscientist examines brain tissue from a professional piano player and a person who has never played piano. She looks specifically at the areas controlling finger movements. What difference would she most likely observe?</div>
+                <div class="difficulty">(Synthesis - Advanced)</div>
+                <div class="choices">
+                    <label class="choice"><input type="radio" name="q6" value="A"> A) The piano player would have more neurons in that area</label>
+                    <label class="choice"><input type="radio" name="q6" value="B"> B) The piano player would have larger neurons</label>
+                    <label class="choice"><input type="radio" name="q6" value="C"> C) The piano player would have more numerous and stronger synaptic connections in that area</label>
+                    <label class="choice"><input type="radio" name="q6" value="D"> D) The piano player would have faster neurotransmitters</label>
+                </div>
+                <button class="check-answer" onclick="checkAnswer('q6', 'C', 'Years of practice don\'t create new neurons or change neurotransmitter speed. Instead, they create more synaptic connections and strengthen existing ones in the relevant brain areas. This is how expertise develops at the cellular level.')">Check Answer</button>
+                <div class="feedback" id="q6-feedback"></div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 15px; background-color: #e3f2fd; border-radius: 5px;">
+                <p style="margin: 0; font-size: 0.9em;"><strong>💡 Learning Tip:</strong> If you got some wrong, that's actually good! Making mistakes and then learning the correct answer strengthens synaptic connections more than getting everything right the first time. Your brain learns best from errors!</p>
+            </div>
+        </div>
+
+        <div class="completion-box">
+            <h3>🎉 Section 1 Complete!</h3>
+            <p>You've learned how neurons and synapses form the physical basis of learning. Every time you practice, you're literally rewiring your brain!</p>
+            <p style="margin-top: 15px;"><strong>Next up:</strong> Section 2 - Neuroplasticity: Your Brain Is Always Remodeling Itself</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-button prev" id="prev-btn" onclick="navigate(-1)" disabled>
+            <span class="arrow">←</span>
+            <span>Previous</span>
+        </button>
+        <button class="nav-button next" id="next-btn" onclick="navigate(1)">
+            <span>Next</span>
+            <span class="arrow">→</span>
+        </button>
+    </div>
+
+    <script>
+        let currentPart = 1;
+        const totalParts = 5;
+
+        function updateDisplay() {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show current section
+            document.getElementById(`part-${currentPart}`).classList.add('active');
+            
+            // Update progress text
+            document.getElementById('current-part').textContent = currentPart;
+            
+            // Update progress dots
+            document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+                const partNum = index + 1;
+                dot.classList.remove('active', 'completed');
+                if (partNum < currentPart) {
+                    dot.classList.add('completed');
+                } else if (partNum === currentPart) {
+                    dot.classList.add('active');
+                }
+            });
+            
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentPart === 1;
+            nextBtn.disabled = currentPart === totalParts;
+            
+            // Change "Next" to "Finish" on last part
+            if (currentPart === totalParts) {
+                nextBtn.innerHTML = '<span>Section Complete!</span> <span class="arrow">✓</span>';
+            } else {
+                nextBtn.innerHTML = '<span>Next</span> <span class="arrow">→</span>';
+            }
+            
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function navigate(direction) {
+            const newPart = currentPart + direction;
+            if (newPart >= 1 && newPart <= totalParts) {
+                currentPart = newPart;
+                updateDisplay();
+            }
+        }
+
+        function checkAnswer(questionId, correctAnswer, explanation) {
+            const selectedRadio = document.querySelector(`input[name="${questionId}"]:checked`);
+            const feedbackDiv = document.getElementById(`${questionId}-feedback`);
+            
+            if (!selectedRadio) {
+                feedbackDiv.innerHTML = '<p style="color: #ff9800; margin-top: 10px;">⚠️ Please select an answer first!</p>';
+                return;
+            }
+            
+            const userAnswer = selectedRadio.value;
+            
+            if (userAnswer === correctAnswer) {
+                feedbackDiv.innerHTML = `
+                    <div style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 12px; margin-top: 10px; border-radius: 3px;">
+                        <p style="color: #155724; margin: 0; font-weight: bold;">✓ Correct!</p>
+                        <p style="color: #155724; margin: 8px 0 0 0; font-size: 0.9em;">${explanation}</p>
+                    </div>
+                `;
+            } else {
+                feedbackDiv.innerHTML = `
+                    <div style="background-color: #f8d7da; border-left: 4px solid #dc3545; padding: 12px; margin-top: 10px; border-radius: 3px;">
+                        <p style="color: #721c24; margin: 0; font-weight: bold;">✗ Not quite.</p>
+                        <p style="color: #721c24; margin: 8px 0 0 0; font-size: 0.9em;">The correct answer is <strong>${correctAnswer}</strong>.</p>
+                        <p style="color: #721c24; margin: 8px 0 0 0; font-size: 0.9em;">${explanation}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Allow keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && currentPart > 1) {
+                navigate(-1);
+            } else if (e.key === 'ArrowRight' && currentPart < totalParts) {
+                navigate(1);
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+    </script>
+
+    <hr style="margin: 40px 0; border: none; border-top: 2px solid #bdc3c7;">
+    
+    <p style="text-align: center; color: #7f8c8d; font-style: italic;">End of Section 1<br>Next: Section 2 - Neuroplasticity: Your Brain Is Always Remodeling Itself</p>
+
+</body>
+</html>
